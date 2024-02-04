@@ -101,7 +101,7 @@ def extended_plot(data, L, k, t0, pop_min =0, years_before = 100, years_after = 
     plt.ylabel('Population')
     plt.title('Predicted Global Population From 1850-2223')
 
-
+""" 
 data = s['total']
 x,y = plot_ratios(data)
 a,b = linear_regression(x,y)
@@ -110,3 +110,35 @@ L,k = t(a,b, data, t0=t0 )
 print(L, k)
 #extended_plot(data, L=L, k=k, t0=t0, figsize=FS)
 plt.show()
+ """
+
+df = pd.read_csv('./world_population_by_year_1950_2023.csv')
+dfMalaria = pd.read_csv('./incedenceOfMalaria.csv')
+dfTuber = pd.read_csv('./incedenceOfTuberculosis.csv')
+dfDoctors = pd.read_csv('./medicalDoctors.csv')
+
+print(dfMalaria)
+print(dfTuber)
+print(dfDoctors)
+print(df)
+
+# process function
+def process(data, pop):
+    data_start, data_end = data['Period'].min(), data['Period'].max()
+    population = []
+    value = []
+    print(data_start, data_end)
+    for i in range(data_start, data_end+1): # i is the value of the year 
+        col = data.loc[data['Period'] == i]
+        # Getting Population
+        values = pop.loc[pop['country'].isin(col['Location'].to_numpy())]
+        total_pop = sum(values[str(i)])
+        population.append(total_pop)
+        # Get Tooltip Value 
+        Tooltip = col['First Tooltip'].apply(lambda a: float((a.split())[0]))
+        col['Tooltip'] = Tooltip
+        value.append(sum(col['Tooltip']))
+    return population, value
+
+
+print(process(dfTuber, df))
